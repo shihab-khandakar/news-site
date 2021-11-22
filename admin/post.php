@@ -23,10 +23,22 @@
 
                     $offset = ($page - 1)* $limit ;
 
-                    $sql = "select post.post_id,post.title,post.post_date,post.author,category.category_name,user.username from post 
-                    left join category on post.category = category.category_id 
-                    left join user on post.author = user.user_id 
-                    order by post_id desc limit {$offset},{$limit}";
+                    if($_SESSION['user_role'] == 1){
+
+                        $sql = "select post.post_id,post.title,post.post_date,post.category,post.author,category.category_name,user.username from post 
+                        left join category on post.category = category.category_id 
+                        left join user on post.author = user.user_id 
+                        order by post_id desc limit {$offset},{$limit}";
+
+                    }elseif($_SESSION['user_role'] == 0){
+                        
+                        $sql = "select post.post_id,post.title,post.post_date,post.category,post.author,category.category_name,user.username from post 
+                        left join category on post.category = category.category_id 
+                        left join user on post.author = user.user_id
+                        where post.author = {$_SESSION['user_id']} 
+                        order by post_id desc limit {$offset},{$limit}";
+
+                    }
 
                     $result = mysqli_query($conn , $sql) or die("Qurey failed") ;
 
@@ -57,7 +69,7 @@
                               <td><?php echo $row["post_date"];  ?></td>
                               <td><?php echo $row["username"];  ?></td>
                               <td class='edit'><a href='update-post.php?id=<?php echo $row['post_id'];  ?>'><i class='fa fa-edit'></i></a></td>
-                              <td class='delete'><a href='delete-post.php?id=<?php echo $row['post_id'];  ?>'><i class='fa fa-trash-o'></i></a></td>
+                              <td class='delete'><a href='delete-post.php?id=<?php echo $row['post_id'];  ?>&cat_id=<?php echo $row['category'];  ?>'><i class='fa fa-trash-o'></i></a></td>
                           </tr>
                           <?php } ?>
                       </tbody>
