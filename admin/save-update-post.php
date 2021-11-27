@@ -39,9 +39,14 @@
 
     }
 
-    $sql = "update post set title ='{$_POST["post_title"]}',description ='{$_POST["postdesc"]}',category ='{$_POST["category"]}',post_img ='{$file_name}' where post_id = '{$_POST["post_id"]}'";
+    $sql = "update post set title ='{$_POST["post_title"]}',description ='{$_POST["postdesc"]}',category ='{$_POST["category"]}',post_img ='{$file_name}' where post_id = '{$_POST["post_id"]}';";
 
-    $result = mysqli_query($conn , $sql);
+    if($_POST['old_category'] != $_POST['category']){
+        $sql .= "update category set post = post - 1 where category_id = '{$_POST['old_category']}';";
+        $sql .= "update category set post = post + 1 where category_id = '{$_POST['category']}';";
+    }
+
+    $result = mysqli_multi_query($conn , $sql);
 
     if($result){
         header("location: {$hostname}/admin/post.php");
